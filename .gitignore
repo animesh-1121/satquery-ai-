@@ -46,10 +46,8 @@ environment.lock.yml
 *.bin
 *.safetensors
 checkpoints/
-models/*/weights/
-models/*/checkpoints/
-
-# External repositories
+weights/
+venv310/
 GeoChat/
 
 # Data

@@ -15,8 +15,9 @@ import warnings
 # Note: These require the GeoChat package to be installed
 try:
     from geochat.model.builder import load_pretrained_model
-    from geochat.mm_utils import get_model_name_from_path
+    from geochat.mm_utils import get_model_name_from_path, process_images_demo
     from geochat.conversation import conv_templates, Chat
+    from geochat.constants import IMAGE_TOKEN_INDEX
     GEOCHAT_AVAILABLE = True
 except ImportError:
     GEOCHAT_AVAILABLE = False
@@ -158,9 +159,9 @@ class GeoChatInference:
         conv = conv_templates[self.conv_mode].copy()
         inp = f"USER: <image>\n{question}\nASSISTANT:"
         
-        # Process image
-        image_tensor = self.image_processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
-        image_tensor = image_tensor.unsqueeze(0).to(self.device, dtype=torch.float16)
+        # Process image using GeoChat's image processing
+        image_tensor = process_images_demo([image], self.image_processor)
+        image_tensor = image_tensor.to(self.device, dtype=torch.float16)
         
         # Tokenize input
         input_ids = self.tokenizer(inp, return_tensors='pt').input_ids.to(self.device)
