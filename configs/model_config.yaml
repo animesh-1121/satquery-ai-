@@ -1,0 +1,116 @@
+# Model Configuration for SatQueryAI
+#
+# This configuration file defines model settings for different model types,
+# including encoder freezing for lightweight adaptation experiments.
+
+models:
+  # RemoteCLIP VQA Model
+  remoteclip_vqa:
+    enabled: true
+    model_name: "ViT-B-32"  # RN50, ViT-B-32, ViT-L-14
+    device: "cuda"  # cuda or cpu
+    checkpoint_path: null  # Local path or null to download from HF
+    cache_dir: null  # Cache directory for downloaded models
+    
+    # Encoder freezing for lightweight adaptation
+    freeze_encoder: true  # Freeze RemoteCLIP encoder (recommended for limited GPU)
+    freeze_encoder_bn: true  # Freeze batch normalization layers
+    
+    # Training configuration (for BigEarthNet adaptation)
+    training:
+      enabled: false  # Set to true to enable training
+      learning_rate: 1e-4
+      batch_size: 1  # Small batch size for 8 GB RAM
+      num_epochs: 10
+      gradient_accumulation_steps: 4  # Effective batch size = 4
+      warmup_steps: 100
+      weight_decay: 0.01
+      max_grad_norm: 1.0
+    
+    # Head configuration
+    head:
+      hidden_dim: 512
+      dropout: 0.1
+      num_classes: 7  # Land cover classes
+    
+    # Task configuration
+    tasks:
+      land_cover:
+        enabled: true
+        classes: ["water", "forest", "agricultural", "urban/built-up", "barren", "grassland", "mixed"]
+      water_presence:
+        enabled: true
+        classes: ["no water", "water present"]
+      urban_rural:
+        enabled: true
+        classes: ["rural", "urban"]
+      scene_type:
+        enabled: true
+        classes: ["water", "forest", "agricultural", "urban/built-up", "barren", "grassland", "mixed"]
+
+  # GeoChat Model (Phase 1 baseline)
+  geochat:
+    enabled: false  # Disabled per Phase 2 requirements (not mandatory)
+    checkpoint: "MBZUAI/geochat-7B"
+    device: "cuda"
+    load_8bit: false
+    load_4bit: false
+    max_new_tokens: 300
+    do_sample: false
+
+# Hardware constraints
+hardware:
+  # For RTX 2050 4GB VRAM
+  gpu_memory_limit_mb: 3500  # Leave 500MB for system
+  cpu_memory_limit_mb: 6144  # 6 GB out of 8 GB RAM
+  
+  # Batch size configuration
+  batch_size: 1  # Small batch size for limited memory
+  gradient_accumulation_steps: 4  # Effective batch size = 4
+  
+  # Data loading
+  num_workers: 0  # 0 for Windows compatibility
+  pin_memory: false  # Disable to reduce memory usage
+  prefetch_factor: 2
+
+# Training output configuration
+training:
+  output_dir: "checkpoints"
+  log_dir: "logs"
+  save_steps: 500
+  eval_steps: 500
+  logging_steps: 100
+  
+  # Checkpointing
+  save_total_limit: 3  # Keep only last 3 checkpoints
+  save_best_only: true
+  metric_for_best_model: "accuracy"
+  
+  # Early stopping
+  early_stopping_patience: 3
+  early_stopping_threshold: 0.001
+
+# MLflow configuration (for experiment tracking)
+mlflow:
+  enabled: false  # Set to true to enable MLflow logging
+  tracking_uri: null  # MLflow server URI
+  experiment_name: "satquery-ai"
+  run_name: null  # Auto-generated if null
+  
+  # Parameters to log
+  log_parameters:
+    - model_name
+    - dataset
+    - learning_rate
+    - batch_size
+    - num_epochs
+    - random_seed
+    - image_size
+    - freeze_encoder
+  
+  # Metrics to log
+  log_metrics:
+    - train_loss
+    - val_loss
+    - val_accuracy
+    - learning_rate

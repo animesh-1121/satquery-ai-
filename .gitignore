@@ -59,6 +59,16 @@ datasets/
 *.tif
 *.tiff
 
+# Data manifests and indices (auto-generated)
+data_manifest.json
+manifest.json
+splits/
+*.json
+
+# Temporary data files
+temp/
+tmp/
+
 # Logs
 logs/
 *.log

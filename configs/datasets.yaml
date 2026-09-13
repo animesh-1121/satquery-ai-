@@ -1,0 +1,72 @@
+# Dataset Configuration for SatQueryAI
+# 
+# This configuration file defines dataset paths and settings for all supported datasets.
+# Dataset paths should be configured via environment variables or absolute paths.
+# Do NOT hardcode local machine paths that are specific to one developer.
+
+datasets:
+  # BigEarthNet - Primary adaptation dataset
+  bigearthnet:
+    root: ${BIGEARTHNET_ROOT:-/path/to/bigearthnet}  # Set via BIGEARTHNET_ROOT env var
+    enabled: true
+    subset_size: 100  # Use only 100 samples for development (set to null for full dataset)
+    random_seed: 42
+    split: "s2"  # "s1" for Sentinel-1 (SAR) or "s2" for Sentinel-2 (optical)
+    modality: "optical"  # optical or sar
+    description: "BigEarthNet multi-label remote sensing dataset with Sentinel-2 imagery"
+    
+  # VRSBench - Single-image evaluation dataset
+  vrsbench:
+    root: ${VRSBENCH_ROOT:-/path/to/vrsbench}  # Set via VRSBENCH_ROOT env var
+    enabled: true
+    subset_size: 50  # Use only 50 samples for development
+    random_seed: 42
+    description: "VRSBench remote sensing VQA, captioning, and grounding benchmark"
+    
+  # RSVQA - Remote sensing VQA dataset
+  rsvqa:
+    root: ${RSVQA_ROOT:-/path/to/rsvqa}  # Set via RSVQA_ROOT env var
+    enabled: true
+    subset_size: 50  # Use only 50 samples for development
+    random_seed: 42
+    description: "Remote sensing visual question answering dataset"
+    
+  # CDVQA - Change detection VQA dataset
+  cdvqa:
+    root: ${CDVQA_ROOT:-/path/to/cdvqa}  # Set via CDVQA_ROOT env var
+    enabled: true
+    subset_size: 50  # Use only 50 samples for development
+    random_seed: 42
+    description: "Change detection visual question answering dataset"
+
+# Preprocessing configuration
+preprocessing:
+  target_size: [224, 224]  # Target size for RemoteCLIP (width, height)
+  tile_size: null  # Set to [width, height] to enable tiling
+  overlap: 0  # Overlap between tiles in pixels
+  max_size: [1024, 1024]  # Maximum size for large images
+  normalize: true  # Normalize pixel values to [0, 1]
+  preserve_bands: true  # Preserve spectral bands for multispectral data
+  resize_method: "resize"  # 'crop', 'pad', or 'resize'
+  band_selection: null  # Specific bands to select (e.g., ['R', 'G', 'B'])
+
+# Data splits configuration
+splits:
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  random_seed: 42
+  use_official_splits: true  # Use official splits if available
+
+# Hardware constraints
+hardware:
+  batch_size: 1  # Small batch size for 8 GB RAM
+  num_workers: 0  # 0 for no multiprocessing (safer on Windows)
+  pin_memory: false  # Disable pinning to reduce memory usage
+  prefetch_factor: 2
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "data_pipeline.log"
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

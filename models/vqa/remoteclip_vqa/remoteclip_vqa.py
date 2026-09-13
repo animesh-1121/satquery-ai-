@@ -216,7 +216,8 @@ class RemoteCLIPVQA(VQAModel):
         model_name: str = "ViT-B-32",
         device: str = "cuda",
         checkpoint_path: Optional[str] = None,
-        cache_dir: Optional[str] = None
+        cache_dir: Optional[str] = None,
+        freeze_encoder: bool = True
     ):
         """
         Initialize RemoteCLIP VQA model.
@@ -226,6 +227,7 @@ class RemoteCLIPVQA(VQAModel):
             device: Device to run inference on ('cuda' or 'cpu')
             checkpoint_path: Local path to RemoteCLIP checkpoint (if None, downloads from HF)
             cache_dir: Directory for caching downloaded checkpoints
+            freeze_encoder: Whether to freeze the RemoteCLIP encoder (for lightweight adaptation)
         """
         super().__init__(
             model_name=f"RemoteCLIP-{model_name}",
@@ -235,6 +237,7 @@ class RemoteCLIPVQA(VQAModel):
         self.remoteclip_model_name = model_name
         self.checkpoint_path = checkpoint_path
         self.cache_dir = cache_dir
+        self.freeze_encoder = freeze_encoder
         
         # Model components
         self.remoteclip_model = None
@@ -286,6 +289,13 @@ class RemoteCLIPVQA(VQAModel):
         # Move to device and set to eval mode
         self.remoteclip_model = self.remoteclip_model.to(self.device).eval()
         
+        # Freeze encoder if requested
+        if self.freeze_encoder:
+            print("Freezing RemoteCLIP encoder...")
+            for param in self.remoteclip_model.visual.parameters():
+                param.requires_grad = False
+            print("RemoteCLIP encoder frozen")
+        
         # Initialize VQA heads for each task
         print("Initializing VQA heads...")
         for task, config in self.TASK_CONFIGS.items():
@@ -293,6 +303,10 @@ class RemoteCLIPVQA(VQAModel):
             head = VQAHead(self.embedding_dim, num_classes).to(self.device)
             self.vqa_heads[task] = head
             print(f"  {task.value}: {num_classes} classes")
+            
+            # Freeze heads by default (unfreeze for training)
+            for param in head.parameters():
+                param.requires_grad = False
         
         self._loaded = True
         print("RemoteCLIP VQA model loaded successfully")
@@ -467,7 +481,8 @@ def create_inference_engine(
     model_name: str = "ViT-B-32",
     device: str = "cuda",
     checkpoint_path: Optional[str] = None,
-    cache_dir: Optional[str] = None
+    cache_dir: Optional[str] = None,
+    freeze_encoder: bool = True
 ) -> RemoteCLIPVQA:
     """
     Factory function to create a RemoteCLIP VQA inference engine.
@@ -477,6 +492,7 @@ def create_inference_engine(
         device: Device to run inference on ('cuda' or 'cpu')
         checkpoint_path: Local path to RemoteCLIP checkpoint
         cache_dir: Directory for caching downloaded checkpoints
+        freeze_encoder: Whether to freeze the RemoteCLIP encoder
         
     Returns:
         RemoteCLIPVQA: Initialized inference engine
@@ -485,7 +501,8 @@ def create_inference_engine(
         model_name=model_name,
         device=device,
         checkpoint_path=checkpoint_path,
-        cache_dir=cache_dir
+        cache_dir=cache_dir,
+        freeze_encoder=freeze_encoder
     )
     engine.load()
     return engine
