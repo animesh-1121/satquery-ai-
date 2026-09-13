@@ -1,0 +1,23 @@
+# GeoChat Configuration for SatQueryAI
+
+model:
+  name: "GeoChat"
+  checkpoint: "MBZUAI/geochat-7B"
+  base_llm: "Vicuna-13B-v1.3"
+  vision_encoder: "CLIP-L-336px"
+  
+inference:
+  device: "cuda"
+  load_8bit: false
+  load_4bit: false
+  max_new_tokens: 300
+  do_sample: false
+  
+input:
+  image_resolution: 504
+  image_aspect_ratio: "pad"
+  supported_formats: ["jpg", "jpeg", "png"]
+  
+output:
+  confidence_available: false
+  format: "json"
