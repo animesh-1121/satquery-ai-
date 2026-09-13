@@ -51,8 +51,7 @@ venv310/
 GeoChat/
 test_image.jpg
 
-# Data
-data/
+# Data (ignore actual data files, keep directory structure)
 datasets/
 *.jpg
 *.jpeg

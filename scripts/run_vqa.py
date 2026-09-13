@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-CLI script for running GeoChat VQA inference.
+CLI script for running VQA inference on remote sensing images.
 
 This script provides a command-line interface for running visual question answering
-on remote sensing images using the GeoChat model.
+using SatQueryAI's pluggable model architecture with RemoteCLIP.
 
 Usage:
     python scripts/run_vqa.py --image <image_path> --question "What type of land cover is visible in this image?"
@@ -13,17 +13,19 @@ import argparse
 import json
 import sys
 import os
+import time
+import traceback
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from models.vqa.geochat import create_inference_engine
+from models.vqa.remoteclip_vqa import create_inference_engine
 
 
 def parse_args():
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Run GeoChat VQA inference on remote sensing images"
+        description="Run VQA inference on remote sensing images using RemoteCLIP"
     )
     
     parser.add_argument(
@@ -41,10 +43,11 @@ def parse_args():
     )
     
     parser.add_argument(
-        "--model-path",
+        "--model-name",
         type=str,
-        default="MBZUAI/geochat-7B",
-        help="Path or HuggingFace ID to GeoChat model (default: MBZUAI/geochat-7B)"
+        default="ViT-B-32",
+        choices=["RN50", "ViT-B-32", "ViT-L-14"],
+        help="RemoteCLIP model variant (default: ViT-B-32)"
     )
     
     parser.add_argument(
@@ -56,16 +59,17 @@ def parse_args():
     )
     
     parser.add_argument(
-        "--load-8bit",
-        action="store_true",
-        help="Load model in 8-bit mode for memory efficiency"
+        "--checkpoint-path",
+        type=str,
+        default=None,
+        help="Local path to RemoteCLIP checkpoint (if None, downloads from HuggingFace)"
     )
     
     parser.add_argument(
-        "--max-new-tokens",
-        type=int,
-        default=300,
-        help="Maximum number of tokens to generate (default: 300)"
+        "--cache-dir",
+        type=str,
+        default=None,
+        help="Directory for caching downloaded checkpoints"
     )
     
     parser.add_argument(
@@ -88,30 +92,37 @@ def main():
         sys.exit(1)
     
     print("=" * 60)
-    print("GeoChat VQA Inference")
+    print("RemoteCLIP VQA Inference")
     print("=" * 60)
     print(f"Image: {args.image}")
     print(f"Question: {args.question}")
-    print(f"Model: {args.model_path}")
+    print(f"Model: RemoteCLIP-{args.model_name}")
     print(f"Device: {args.device}")
-    print(f"8-bit mode: {args.load_8bit}")
     print("=" * 60)
     
     try:
         # Create inference engine
-        print("\nLoading GeoChat model...")
+        print("\nLoading RemoteCLIP model...")
+        load_start = time.time()
         engine = create_inference_engine(
-            model_path=args.model_path,
+            model_name=args.model_name,
             device=args.device,
-            load_8bit=args.load_8bit
+            checkpoint_path=args.checkpoint_path,
+            cache_dir=args.cache_dir
         )
+        load_elapsed = time.time() - load_start
+        
+        # Get image info
+        from PIL import Image
+        img = Image.open(args.image)
+        img_size = img.size
+        img_mode = img.mode
         
         # Run inference
         print("Running inference...")
         result = engine.predict(
             image_path=args.image,
-            question=args.question,
-            max_new_tokens=args.max_new_tokens
+            question=args.question
         )
         
         # Display results
@@ -120,20 +131,55 @@ def main():
         print("=" * 60)
         print(f"Answer: {result['answer']}")
         print(f"Model: {result['model']}")
-        print(f"Confidence: {result['confidence']}")
+        print(f"Task: {result['task']}")
+        print(f"Predicted class: {result['predicted_class']}")
+        print(f"Confidence: {result['confidence']:.4f}")
+        print(f"Device: {result['device']}")
+        print(f"Inference time: {result['inference_time_s']}s")
+        print(f"Model load time: {load_elapsed:.1f}s")
+        print(f"Image: {img_size[0]}x{img_size[1]} {img_mode}")
+        
+        if "all_probabilities" in result:
+            print("\nClass probabilities:")
+            for class_name, prob in result['all_probabilities'].items():
+                print(f"  {class_name}: {prob:.4f}")
+        
+        if "memory" in result and result["memory"]:
+            print(f"\nMemory: {json.dumps(result['memory'])}")
+        
         print("=" * 60)
+        
+        # Build full output
+        full_result = {
+            **result,
+            "model_load_time_s": round(load_elapsed, 2),
+            "image_path": os.path.abspath(args.image),
+            "image_dimensions": f"{img_size[0]}x{img_size[1]}",
+            "image_mode": img_mode,
+            "question": args.question,
+        }
         
         # Save to JSON if requested
         if args.output:
             with open(args.output, 'w') as f:
-                json.dump(result, f, indent=2)
+                json.dump(full_result, f, indent=2)
             print(f"\nResults saved to: {args.output}")
         
         return 0
         
+    except MemoryError as e:
+        print(f"\n✗ Hardware insufficient: {e}")
+        return 1
+    except RuntimeError as e:
+        if "out of memory" in str(e).lower():
+            print(f"\n✗ Out of memory: {e}")
+            print("Try: --device cpu")
+        else:
+            print(f"\n✗ Runtime error: {e}")
+            traceback.print_exc()
+        return 1
     except Exception as e:
-        print(f"\nError during inference: {e}")
-        import traceback
+        print(f"\n✗ Error during inference: {e}")
         traceback.print_exc()
         return 1
 
