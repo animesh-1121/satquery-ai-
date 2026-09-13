@@ -15,8 +15,47 @@ This phase establishes a baseline for single-image remote sensing visual questio
 - ✅ CLI test script created
 - ✅ Unit tests written and passing
 - ✅ Comprehensive documentation
-- ⚠️ GeoChat package installation required for real inference
-- ⚠️ Real inference testing pending GeoChat installation
+- ⚠️ GeoChat package installation compatibility issues with Python 3.12+
+- ⚠️ Real inference testing pending environment resolution
+
+## GeoChat Installation Compatibility Issues
+
+**Current Problem**: GeoChat has strict dependency requirements that conflict with modern Python environments:
+
+- **Required**: Python 3.10, PyTorch 2.0.1, transformers 4.31.0
+- **Current**: Python 3.12/3.13, newer library versions
+- **Issue**: Old dependencies lack pre-built wheels for Python 3.12+, and source compilation fails on Windows
+
+**Attempted Solutions**:
+1. ✅ Modified GeoChat pyproject.toml to use flexible dependency versions
+2. ✅ Removed problematic deepspeed dependency (training-only)
+3. ❌ Downgraded transformers to 4.31.0 (tokenizers compilation failed)
+4. ❌ Dependency conflicts persist
+
+**Recommended Solutions**:
+
+### Option 1: Use Python 3.10 Environment (Recommended)
+```bash
+# Install Python 3.10 and create dedicated environment
+py -3.10 -m venv venv310
+venv310\Scripts\activate
+pip install torch==2.0.1 torchvision==0.15.2 --index-url https://download.pytorch.org/whl/cu118
+pip install transformers==4.31.0 tokenizers==0.13.3
+cd GeoChat && pip install -e .
+```
+
+### Option 2: Use Docker Container
+```bash
+# Use Python 3.10 base image
+docker run -it python:3.10 bash
+# Follow GeoChat installation instructions
+```
+
+### Option 3: Alternative Remote Sensing VLMs
+Consider more modern alternatives with better Python 3.12+ support:
+- BLIP-2, InstructBLIP (Salesforce)
+- OpenCLIP, CLIP models
+- Recent HuggingFace vision-language models
 
 ## Project Structure
 
@@ -71,7 +110,10 @@ conda activate satquery-ai
 
 ### 2. Install GeoChat
 
+**⚠️ Compatibility Note**: GeoChat requires Python 3.10 with specific dependency versions. Installation on Python 3.12+ requires the solutions documented in the "GeoChat Installation Compatibility Issues" section above.
+
 ```bash
+# Recommended: Use Python 3.10 environment
 git clone https://github.com/mbzuai-oryx/GeoChat.git
 cd GeoChat
 pip install -e .

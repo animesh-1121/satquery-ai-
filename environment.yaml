@@ -4,31 +4,31 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.10
+  - python=3.12
   - pip>=23.0
-  - pytorch=2.0.1
-  - torchvision=0.15.2
+  - pytorch=2.2.0
+  - torchvision=0.17.0
   - pip:
-    - einops==0.6.1
+    - einops==0.8.0
     - einops-exts==0.0.4
     - fastapi
-    - gradio==3.35.2
+    - gradio==4.0.0
     - markdown2[all]
     - numpy
     - requests
-    - sentencepiece==0.1.99
+    - sentencepiece
     - tokenizers>=0.12.1
     - uvicorn
     - wandb
     - shortuuid
-    - httpx==0.24.0
-    - deepspeed==0.9.5
-    - peft==0.4.0
-    - transformers==4.31.0
-    - accelerate==0.21.0
-    - bitsandbytes==0.41.0
-    - scikit-learn==1.2.2
-    - timm==0.6.13
-    - gradio_client==0.2.9
+    - httpx
+    - deepspeed
+    - peft
+    - transformers
+    - accelerate
+    - bitsandbytes
+    - scikit-learn
+    - timm
+    - gradio_client
     - opencv-python
     - pillow

@@ -49,6 +49,9 @@ checkpoints/
 models/*/weights/
 models/*/checkpoints/
 
+# External repositories
+GeoChat/
+
 # Data
 data/
 datasets/
