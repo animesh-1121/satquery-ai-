@@ -49,6 +49,7 @@ checkpoints/
 weights/
 venv310/
 GeoChat/
+test_image.jpg
 
 # Data
 data/
