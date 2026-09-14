@@ -9,11 +9,11 @@ datasets:
   bigearthnet:
     root: ${BIGEARTHNET_ROOT:-/path/to/bigearthnet}  # Set via BIGEARTHNET_ROOT env var
     enabled: true
-    subset_size: 100  # Use only 100 samples for development (set to null for full dataset)
+    subset_size: 100  # Use only 100 samples for development (set to null for full dataset ~590,000 samples)
     random_seed: 42
     split: "s2"  # "s1" for Sentinel-1 (SAR) or "s2" for Sentinel-2 (optical)
     modality: "optical"  # optical or sar
-    description: "BigEarthNet multi-label remote sensing dataset with Sentinel-2 imagery"
+    description: "BigEarthNet multi-label remote sensing dataset with Sentinel-2 imagery (~590,000 patches, 43 classes)"
     
   # VRSBench - Single-image evaluation dataset
   vrsbench:
