@@ -31,6 +31,9 @@ from .manifest import DatasetManifest
 from .splits import DataSplitter, create_train_val_test_split
 from .remoteclip_preprocessing import RemoteCLIPPreprocessor, prepare_image_for_remoteclip
 from .adapters import BigEarthNetDataset, VRSBenchDataset, RSVQADataset, CDVQADataset
+from .vqa_dataset import VQADataset, SyntheticVQADataset, create_vqa_dataloader, collate_fn
+from .rsvqa_parser import RSVQAAnnotationParser, create_rsvqa_parser
+from .real_vqa_dataset import RealVQADataset, create_real_vqa_dataloader
 
 __all__ = [
     "BaseRemoteSensingDataset",
@@ -51,4 +54,12 @@ __all__ = [
     "VRSBenchDataset",
     "RSVQADataset",
     "CDVQADataset",
+    "VQADataset",
+    "SyntheticVQADataset",
+    "create_vqa_dataloader",
+    "collate_fn",
+    "RSVQAAnnotationParser",
+    "create_rsvqa_parser",
+    "RealVQADataset",
+    "create_real_vqa_dataloader",
 ]
