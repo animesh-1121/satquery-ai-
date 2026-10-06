@@ -34,6 +34,7 @@ from .adapters import BigEarthNetDataset, VRSBenchDataset, RSVQADataset, CDVQADa
 from .vqa_dataset import VQADataset, SyntheticVQADataset, create_vqa_dataloader, collate_fn
 from .rsvqa_parser import RSVQAAnnotationParser, create_rsvqa_parser
 from .real_vqa_dataset import RealVQADataset, create_real_vqa_dataloader
+from .change_detection_dataset import ChangeDetectionDataset, ChangeDetectionSample, create_change_detection_dataloader
 
 __all__ = [
     "BaseRemoteSensingDataset",
@@ -62,4 +63,7 @@ __all__ = [
     "create_rsvqa_parser",
     "RealVQADataset",
     "create_real_vqa_dataloader",
+    "ChangeDetectionDataset",
+    "ChangeDetectionSample",
+    "create_change_detection_dataloader",
 ]

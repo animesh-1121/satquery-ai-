@@ -48,6 +48,21 @@ This phase extends Phase 3 with real dataset integration and training infrastruc
 - Comprehensive testing for real dataset parsing (13 new tests)
 - Complete training documentation
 
+**Phase 4: Bi-Temporal Change Detection** ✅
+
+This phase implements a learned bi-temporal change detection system with Siamese architecture:
+- Siamese architecture with shared RemoteCLIP encoder
+- Temporal feature fusion ([F1, F2, |F1-F2|])
+- Lightweight change detection head (591K trainable parameters)
+- T1/T2 input validation and compatibility checking
+- Change detection training pipeline with parameter verification
+- Smoke test training for infrastructure verification
+- Temporal sanity tests (T1==T2 vs T1!=T2)
+- Command-line inference script for change detection
+- FastAPI endpoint for change detection
+- Comprehensive testing for change detection
+- Complete change detection documentation
+
 **Current Implementation Status:**
 - ✅ Repository structure created
 - ✅ Environment configuration (environment.yaml)
@@ -75,9 +90,16 @@ This phase extends Phase 3 with real dataset integration and training infrastruc
 - ✅ Smoke test training verification
 - ✅ Trained checkpoint with metadata
 - ✅ Updated inference for trained checkpoints
+- ✅ Siamese change detection architecture with shared encoder
+- ✅ Temporal feature fusion for change detection
+- ✅ Change detection training pipeline
+- ✅ Change detection inference scripts and API
+- ✅ Change detection testing infrastructure
+- ✅ Bi-temporal change detection documentation
 - ⚠️ GeoChat package installation compatibility issues with Python 3.12+ (Phase 1)
 - ⚠️ Real dataset testing pending dataset download
 - ⚠️ Real training pending RSVQA dataset availability
+- ⚠️ Real change detection training pending CDVQA dataset availability
 
 ## GeoChat Installation Compatibility Issues
 

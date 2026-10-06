@@ -17,6 +17,13 @@ from abc import ABC, abstractmethod
 from typing import Dict, Optional, Any
 from enum import Enum
 
+__all__ = [
+    'ModelType',
+    'RemoteSensingModel',
+    'VQAModel',
+    'ChangeDetectionModel'
+]
+
 
 class ModelType(Enum):
     """Supported model types in SatQueryAI."""
@@ -126,3 +133,38 @@ class VQAModel(RemoteSensingModel):
     @property
     def model_type(self) -> ModelType:
         return ModelType.VQA
+
+
+class ChangeDetectionModel(RemoteSensingModel):
+    """
+    Abstract base class for Change Detection models.
+    
+    Change detection models take two images of the same area at different times
+    and detect meaningful changes between them.
+    """
+    
+    @abstractmethod
+    def predict(self, image_t1_path: str, image_t2_path: str, **kwargs) -> Dict[str, Any]:
+        """
+        Run change detection inference.
+        
+        Args:
+            image_t1_path: Path to the T1 image (earlier time)
+            image_t2_path: Path to the T2 image (later time)
+            **kwargs: Additional model-specific parameters
+            
+        Returns:
+            Dictionary containing:
+            - change_detected: bool (whether change was detected)
+            - change_label: str (label for detected change)
+            - confidence: Optional[float] (prediction confidence)
+            - model: str (model identifier)
+            - device: str
+            - inference_time_s: float
+            - task: str (change detection task type)
+        """
+        pass
+    
+    @property
+    def model_type(self) -> ModelType:
+        return ModelType.CHANGE_DETECTION
