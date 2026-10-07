@@ -35,6 +35,7 @@ from .vqa_dataset import VQADataset, SyntheticVQADataset, create_vqa_dataloader,
 from .rsvqa_parser import RSVQAAnnotationParser, create_rsvqa_parser
 from .real_vqa_dataset import RealVQADataset, create_real_vqa_dataloader
 from .change_detection_dataset import ChangeDetectionDataset, ChangeDetectionSample, create_change_detection_dataloader
+from .optical_sar_dataset import OpticalSARDataset, OpticalSARSample, create_optical_sar_dataloader
 
 __all__ = [
     "BaseRemoteSensingDataset",
@@ -66,4 +67,7 @@ __all__ = [
     "ChangeDetectionDataset",
     "ChangeDetectionSample",
     "create_change_detection_dataloader",
+    "OpticalSARDataset",
+    "OpticalSARSample",
+    "create_optical_sar_dataloader",
 ]

@@ -63,6 +63,23 @@ This phase implements a learned bi-temporal change detection system with Siamese
 - Comprehensive testing for change detection
 - Complete change detection documentation
 
+**Phase 5: Optical-SAR Cross-Modal Fusion** ✅
+
+This phase implements optical-SAR cross-modal fusion with separate modality encoders:
+- RemoteCLIP ViT-B/32 optical encoder (reused from Phase 3/4)
+- Lightweight CNN SAR encoder (custom, no pretrained weights)
+- Bidirectional cross-modal attention for genuine fusion
+- Feature projection to common fusion dimension
+- Fusion head for classification
+- Optical-SAR dataset loader
+- Training pipeline infrastructure
+- Smoke test training script
+- Comprehensive test suite with modality ablation tests (critical)
+- Command-line inference script
+- FastAPI endpoint for optical-SAR fusion
+- Complete technical documentation
+- ⚠️ Core architecture complete; smoke tests and real training pending open-clip-torch installation
+
 **Current Implementation Status:**
 - ✅ Repository structure created
 - ✅ Environment configuration (environment.yaml)
